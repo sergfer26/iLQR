@@ -101,7 +101,7 @@ def sympy_to_numba(f, args, redu = True):
             f = sp.Array(f)[0, :]
             f = njit(sp.lambdify(args, f, modules = modules))
             f_new = lambda *args: np.array(f(*args))
-            return f#njit(f_new)
+            return f #njit(f_new)
 
     f = sp.lambdify(args, f, modules = modules)
     return njit(f)
