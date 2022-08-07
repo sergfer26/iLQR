@@ -52,6 +52,7 @@ class Dynamics:
            Construct from a continuous time dynamics function
         '''
         f = njit(f)
+
         f_d = lambda x, u: x + f(x, u)*dt
         return Dynamics.Discrete(f_d, x_eps, u_eps)
 
