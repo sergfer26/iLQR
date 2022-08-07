@@ -49,7 +49,7 @@ class iLQR:
 
 
 class MPC:
-
+    # https://en.wikipedia.org/wiki/Model_predictive_control
     def __init__(self, controller, control_horizon = 1):
         '''
         Initialize MPC
@@ -79,8 +79,7 @@ class MPC:
 
 
 @numba.njit
-def run_ilqr(f, f_prime, L, Lf, L_prime, Lf_prime, x0, u_init, max_iters, early_stop,
-             alphas, regu_init = 20, max_regu = 10000, min_regu = 0.001):
+def run_ilqr(f, f_prime, L, Lf, L_prime, Lf_prime, x0, u_init, max_iters, early_stop, alphas, regu_init = 20, max_regu = 10000, min_regu = 0.001):
     '''
        iLQR main loop
     '''
@@ -127,11 +126,10 @@ def rollout(f, L, Lf, x0, us):
     xs[0] = x0
     cost = 0
     for n in range(us.shape[0]):
-      xs[n+1] = f(xs[n], us[n])
-      cost += L(xs[n], us[n])
+        xs[n+1] = f(xs[n], us[n])
+        cost += L(xs[n], us[n])
     cost += Lf(xs[-1])
     return xs, cost
-
 
 @numba.njit
 def forward_pass(f, L, Lf, xs, us, ks, Ks, alpha):
@@ -166,7 +164,6 @@ def backward_pass(f_prime, L_prime, Lf_prime, xs, us, regu):
     V_x, V_xx = Lf_prime(xs[-1])
     regu_I = regu*np.eye(V_xx.shape[0])
     for n in range(us.shape[0] - 1, -1, -1):
-
         f_x, f_u = f_prime(xs[n], us[n])
         l_x, l_u, l_xx, l_ux, l_uu  = L_prime(xs[n], us[n])
 
@@ -192,5 +189,4 @@ def backward_pass(f_prime, L_prime, Lf_prime, xs, us, regu):
         V_xx = Q_xx + 2*K.T@Q_ux + K.T@Q_uu@K
         #expected cost reduction
         delta_V += Q_u.T@k + 0.5*k.T@Q_uu@k
-
     return ks, Ks, delta_V
